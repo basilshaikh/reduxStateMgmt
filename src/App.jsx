@@ -4,62 +4,16 @@ import "./App.css";
 import Products from "./components/Products/Products";
 import Counter from "./components/Counter/Counter";
 import Cart from "./components/Cart/Cart";
+import { useDispatch, useSelector } from "react-redux";
+import { increaseCartQuantity } from "./state/cart/cartSlice";
 
 function App() {
-  const [cartItems, setCartItems] = useState([]);
-
-  const increaseCartQuantity = useCallback((product) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find(
-        (cartItem) => cartItem.id === product?.id
-      );
-
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        return [...prevItems, { ...product, quantity: 1 }];
-      }
-    });
-  }, []);
-
-  const decreaseCartQuantity = useCallback((product) => {
-    if (product.quantity === 0) return;
-
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find(
-        (cartItem) => cartItem.id === product.id
-      );
-
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        );
-      } else {
-        return [...prevItems, { ...product, quantity: 1 }];
-      }
-    });
-  }, []);
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.cart.cartItems);
 
   const handleAddToCart = useCallback(
     (product) => {
-      increaseCartQuantity(product);
-    },
-    [cartItems]
-  );
-
-  const handleDeleteFromCart = useCallback(
-    (item) => {
-      if (item.length === 0) return;
-
-      setCartItems((prevItems) =>
-        prevItems.filter((cartItem) => cartItem.id !== item.id)
-      );
+      dispatch(increaseCartQuantity(product));
     },
     [cartItems]
   );
@@ -68,17 +22,8 @@ function App() {
     <div className="w-full flex flex-col gap-y-10 items-center">
       <Counter cartItems={cartItems} />
       <div className="w-full flex items-top justify-center mx-auto">
-        <Products
-          cartItems={cartItems}
-          increaseCartQuantity={increaseCartQuantity}
-          handleAddToCart={handleAddToCart}
-        />
-        <Cart
-          cartItems={cartItems}
-          increaseCartQuantity={increaseCartQuantity}
-          decreaseCartQuantity={decreaseCartQuantity}
-          handleDeleteFromCart={handleDeleteFromCart}
-        />
+        <Products handleAddToCart={handleAddToCart} />
+        <Cart />
       </div>
     </div>
   );

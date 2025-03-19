@@ -1,7 +1,10 @@
 import React from "react";
 import cartIcon from "./../../assets/cart.svg";
+import { useSelector } from "react-redux";
 
-export default function Counter({ cartItems }) {
+export default function Counter() {
+  const cartItems = useSelector((state) => state.cart.cartItems);
+
   return (
     <div className="relative">
       <img className="w-10 cursor-pointer" src={cartIcon} alt="cart" />
